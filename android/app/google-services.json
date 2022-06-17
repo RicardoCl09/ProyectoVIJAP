@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1059814763043",
+    "project_id": "desaparecidos-67280",
+    "storage_bucket": "desaparecidos-67280.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059814763043:android:2cb78cb525361ad847df96",
+        "android_client_info": {
+          "package_name": "com.example.proyecto_vijap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059814763043-em0k9l4tpnfh5i0f8s6bu7sk2nmg9pa7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiqKWXKCwvyGQN6YSgekslyXK0L-a6oJw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059814763043-em0k9l4tpnfh5i0f8s6bu7sk2nmg9pa7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
