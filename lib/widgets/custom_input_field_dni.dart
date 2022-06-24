@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomInputFieldDNI extends StatelessWidget {
+  final TextEditingController? controller;
   final String? hintText;
   final String? labelText;
   final String? helperText;
@@ -23,11 +24,13 @@ class CustomInputFieldDNI extends StatelessWidget {
     this.obscureText = false,
     required this.formProperty,
     required this.formValues,
+    this.controller,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      // controller: controller,
       autofocus: false,
       initialValue: '',
       textCapitalization: TextCapitalization.words,

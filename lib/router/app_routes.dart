@@ -27,7 +27,7 @@ class AppRoutes {
     Map<String, Widget Function(BuildContext)> appRoutes = {};
     appRoutes.addAll({'login': (BuildContext context) => const LoginScreen()});
     appRoutes.addAll({'home': (BuildContext context) => const HomeScreen()});
-    appRoutes.addAll({'sign': (BuildContext context) => const SignInScreen()});
+    appRoutes.addAll({'sign': (BuildContext context) => SignInScreen()});
     appRoutes
         .addAll({'input': (BuildContext constext) => const InputsScreen()});
     for (final option in menuOptions) {

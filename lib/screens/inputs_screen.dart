@@ -1,64 +1,19 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:proyecto_vijap/theme/app_theme.dart';
-import 'package:proyecto_vijap/widgets/custom_input_field.dart';
+import 'package:proyecto_vijap/widgets/widgets.dart';
 
 class InputsScreen extends StatelessWidget {
   const InputsScreen({Key? key}) : super(key: key);
 
-  void displayDialogAndroid(BuildContext context, String mensaje,
-      GlobalKey<FormState> myFormKey, Map<String, dynamic> formValues) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            elevation: 5,
-            title: Text(mensaje),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                SizedBox(
-                  height: 10,
-                ),
-                Icon(
-                  Icons.android_outlined,
-                  size: 100,
-                  color: AppTheme.primary,
-                )
-              ],
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar')),
-              TextButton(
-                  onPressed: () {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    if (!myFormKey.currentState!.validate()) {
-                      print('Formulario no válido');
-                      Navigator.pop(context);
-                      return;
-                    }
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                    print(formValues);
-                  },
-                  child: const Text('Aceptar'))
-            ],
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final firebase = FirebaseFirestore.instance;
     final GlobalKey<FormState> myFormKey = GlobalKey<FormState>();
-
     final Map<String, dynamic> formValues = {
       'dni': '',
       'first_name': '',
@@ -79,7 +34,7 @@ class InputsScreen extends StatelessWidget {
                   const SizedBox(
                     height: 15,
                   ),
-                  CustomInputField(
+                  CustomInputFieldDNI(
                     labelText: 'DNI',
                     hintText: 'DNI del Desaparecido',
                     keyboardType: TextInputType.number,
@@ -120,13 +75,48 @@ class InputsScreen extends StatelessWidget {
                     height: 30,
                   ),
                   ElevatedButton(
-                      onPressed: () => Platform.isAndroid
-                          ? displayDialogAndroid(
-                              context, 'Mensaje 1', myFormKey, formValues)
-                          : print('No hay IOS implementado'),
+                      onPressed: () async {
+                        bool encontrado = false;
+                        if (!myFormKey.currentState!.validate()) {
+                          inputToast('Formulario no válido');
+                          return;
+                        } else {
+                          try {
+                            CollectionReference ref = FirebaseFirestore.instance
+                                .collection('Desaparecidos');
+                            QuerySnapshot usuario = await ref.get();
+                            if (usuario.docs.isNotEmpty) {
+                              for (dynamic cursor in usuario.docs) {
+                                if (cursor.get('dni') == formValues['dni']) {
+                                  inputToast('Persona reportada anteriormente');
+                                  encontrado = true;
+                                  break;
+                                }
+                              }
+                            }
+                            if (!encontrado) {
+                              await firebase
+                                  .collection('Desaparecidos')
+                                  .doc()
+                                  .set({
+                                'dni': formValues['dni'],
+                                'first_name': formValues['first_name'],
+                                'last_name': formValues['last_name'],
+                                'age': formValues['age'],
+                                'Estado': 'Activo'
+                              });
+                              Navigator.pop(context);
+                              print(formValues);
+                              inputToast('Reporte exitoso');
+                            }
+                          } catch (e) {
+                            print('Error... $e');
+                          }
+                        }
+                      },
                       child: const SizedBox(
                         width: double.infinity,
-                        child: Center(child: Text('Guardar')),
+                        child: Center(child: Text('Reportar')),
                       ))
                 ],
               ),
@@ -134,4 +124,7 @@ class InputsScreen extends StatelessWidget {
           ),
         ));
   }
+
+  void inputToast(msg) => Fluttertoast.showToast(
+      msg: msg, backgroundColor: AppTheme.primary, textColor: Colors.white);
 }

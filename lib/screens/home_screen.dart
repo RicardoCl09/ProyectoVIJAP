@@ -12,6 +12,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Center(child: Text('BUSCAPP')),
+          automaticallyImplyLeading: false,
         ),
         body: ListView.separated(
             itemBuilder: (context, index) => ListTile(
@@ -21,14 +22,23 @@ class HomeScreen extends StatelessWidget {
                   ),
                   title: Text(menuOptions[index].name),
                   onTap: () {
-                    // final route = MaterialPageRoute(
-                    //     builder: (context) => const Listview1Screen());
-                    // Navigator.push(context, route);
-
                     Navigator.pushNamed(context, menuOptions[index].route);
                   },
                 ),
             separatorBuilder: (_, __) => const Divider(),
-            itemCount: menuOptions.length));
+            itemCount: menuOptions.length),
+        floatingActionButton: ElevatedButton(
+          onPressed: () => Navigator.pop(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.logout_outlined),
+              SizedBox(
+                width: 10,
+              ),
+              Text('Cerrar Sesión')
+            ],
+          ),
+        ));
   }
 }
