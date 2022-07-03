@@ -1,15 +1,25 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:proyecto_vijap/theme/app_theme.dart';
 import 'package:proyecto_vijap/widgets/widgets.dart';
 
-class InputsScreen extends StatelessWidget {
+class InputsScreen extends StatefulWidget {
   const InputsScreen({Key? key}) : super(key: key);
 
+  @override
+  State<InputsScreen> createState() => _InputsScreenState();
+}
+
+class _InputsScreenState extends State<InputsScreen> {
+  String? imageUrl;
+  String? url;
   @override
   Widget build(BuildContext context) {
     final firebase = FirebaseFirestore.instance;
@@ -19,7 +29,9 @@ class InputsScreen extends StatelessWidget {
       'first_name': '',
       'last_name': '',
       'age': 0,
+      'image': ''
     };
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Reportar Persona Desaparecida'),
@@ -74,6 +86,46 @@ class InputsScreen extends StatelessWidget {
                   const SizedBox(
                     height: 30,
                   ),
+                  Row(
+                    children: [
+                      (imageUrl != null)
+                          ? Image.network(imageUrl!)
+                          : const Placeholder(
+                              fallbackHeight: 10.0, fallbackWidth: 10.0),
+                      const Text("Seleccionar Imagen: "),
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      ElevatedButton(
+                        child: const Text("Cargar Imagen"),
+                        onPressed: () async {
+                          final _storage = FirebaseStorage.instance;
+                          final _picker = ImagePicker();
+                          XFile? image;
+
+                          image = await _picker.pickImage(
+                              source: ImageSource.gallery);
+                          if (image != null) {
+                            var file = File(image.path);
+                            for (int i = 5; i >= 0; i--) {
+                              inputToast('Espere $i segundos...');
+                            }
+                            var snapshot = await _storage
+                                .ref()
+                                .child("fotos/${image.path}")
+                                .putFile(file);
+                            imageUrl = await snapshot.ref.getDownloadURL();
+                            formValues['image'] = imageUrl;
+                          } else {
+                            print("No se recibio");
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: [],
+                  ),
                   ElevatedButton(
                       onPressed: () async {
                         bool encontrado = false;
@@ -103,10 +155,12 @@ class InputsScreen extends StatelessWidget {
                                 'first_name': formValues['first_name'],
                                 'last_name': formValues['last_name'],
                                 'age': formValues['age'],
-                                'Estado': 'Activo'
+                                'image': formValues['image'],
+                                'Estado': 'Desaparecido'
                               });
                               Navigator.pop(context);
                               print(formValues);
+                              print(imageUrl);
                               inputToast('Reporte exitoso');
                             }
                           } catch (e) {
